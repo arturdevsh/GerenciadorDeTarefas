@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import Tasks from './components/Tasks'
+import { SquareUserRound } from 'lucide-react'
 import TaskDetails from './components/TaskDetails'
 import './App.css'
 import AddTask from './components/AddTask'
@@ -148,10 +149,8 @@ function App() {
             })
             saveAuth(response.data.user, response.data.token)
         } catch (error) {
-            console.error('Erro ao cadastrar usuário:', error)
-            alert(
-                'Falha no cadastro. Talvez o nome de usuário ou email já esteja em uso.'
-            )
+            console.log('Erro ao cadastrar usuário:', error)
+            alert(error.response?.data?.error || '')
         }
     }
 
@@ -212,8 +211,8 @@ function App() {
     return (
         <div className="w-screen h-screen bg-cyan-500 flex justify-center p-6">
             <div className="w-[500px] h-full bg-cyan-700 rounded-lg p-6 ">
-                <h1 className="text-3xl text-slate-100 font-bold text-center">
-                    To Do List
+                <h1 className="text-3xl p-4 text-slate-100 font-bold text-center">
+                    Tarefas
                 </h1>
 
                 {!user ? (
@@ -226,8 +225,9 @@ function App() {
                 ) : (
                     <>
                         <div className="flex justify-between items-center mb-4">
-                            <span className="text-slate-200">
-                                {user.username} ({user.email})
+                            <span className="text-slate-200 font-bold">
+                                <SquareUserRound className="inline-block mr-2" />
+                                {user.username}
                             </span>
                             <button
                                 onClick={logout}

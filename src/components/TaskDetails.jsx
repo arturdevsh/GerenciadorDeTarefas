@@ -22,12 +22,16 @@ function TaskDetails({ tasks }) {
     }
 
     return (
-        <div className="space-y-4 text-slate-100">
+        <div className="space-y-4 mx-auto text-slate-100">
             <h2 className="text-2xl font-bold">{task.title}</h2>
             <p className="text-sm text-cyan-200">{task.description}</p>
             <p className="text-sm">
                 Status:{' '}
-                <span className={task.completed ? 'text-emerald-300' : 'text-slate-200'}>
+                <span
+                    className={
+                        task.completed ? 'text-emerald-300' : 'text-slate-200'
+                    }
+                >
                     {task.completed ? 'Concluída' : 'Pendente'}
                 </span>
             </p>
