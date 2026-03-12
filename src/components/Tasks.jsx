@@ -1,6 +1,6 @@
 import { ChevronRightIcon, Trash2 } from 'lucide-react'
 
-function Tasks({ tasks, onTaskClick, onTaskDelete }) {
+function Tasks({ tasks, onTaskClick, onTaskDelete, onTaskView }) {
     if (!tasks?.length) {
         return (
             <div className="text-slate-100">
@@ -17,13 +17,14 @@ function Tasks({ tasks, onTaskClick, onTaskDelete }) {
                         type="button"
                         onClick={() => onTaskClick(task.id)}
                         className={`flex-1 rounded-lg bg-cyan-500/40 p-4 text-left shadow-md hover:bg-cyan-900 transition
-                            ${task.completed ? 'text-emerald-300 bg-emerald-500/20' : 'text-slate-100'}`}
+            ${task.completed ? 'text-emerald-300 bg-emerald-800' : 'text-slate-100'}`}
                     >
                         {task.title}
                     </button>
                     <button
                         type="button"
-                        className="p-4 bg-cyan-500/40 text-slate-100/80 hover:bg-cyan-900 rounded-lg hover:text-slate-100"
+                        onClick={() => onTaskView?.(task.id)}
+                        className="p-4 bg-cyan-500/40 text-slate-100/80 hover:bg-cyan-900 rounded-l-lg hover:text-slate-100"
                     >
                         <ChevronRightIcon />
                     </button>
