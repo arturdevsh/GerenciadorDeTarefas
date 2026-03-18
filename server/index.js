@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import fs from 'fs'
+import https from 'https'
 
 import { query } from './db.js'
 import tasksRoutes from './routes/tasks.js'
@@ -9,10 +11,30 @@ import authRoutes from './routes/auth.js'
 dotenv.config()
 
 const app = express()
-const port = process.env.PORT || 4000
+const isHttpsEnabled = process.env.HTTPS === 'true'
+const port = process.env.PORT || (isHttpsEnabled ? 4000 : 4000)
+const httpPort = process.env.HTTP_PORT || 8080
 
 app.use(cors())
 app.use(express.json())
+
+// Redirect HTTP to HTTPS when requested
+if (process.env.REDIRECT_TO_HTTPS === 'true') {
+    app.enable('trust proxy')
+    app.use((req, res, next) => {
+        const proto = req.headers['x-forwarded-proto'] || req.protocol
+        if (proto && proto.toLowerCase() === 'http') {
+            const host = req.headers.host
+                ? req.headers.host.split(':')[0]
+                : 'localhost'
+            return res.redirect(
+                301,
+                `https://${host}:${port}${req.originalUrl}`
+            )
+        }
+        next()
+    })
+}
 
 app.use('/auth', authRoutes)
 app.use('/tasks', tasksRoutes)
@@ -73,9 +95,25 @@ async function ensureDatabase() {
 
 ensureDatabase()
     .then(() => {
-        app.listen(port, () => {
-            console.log(`API rodando em http://localhost:${port}`)
-        })
+        if (isHttpsEnabled) {
+            try {
+                const keyPath = process.env.SSL_KEY_PATH || './certs/key.pem'
+                const certPath = process.env.SSL_CERT_PATH || './certs/cert.pem'
+                const key = fs.readFileSync(keyPath)
+                const cert = fs.readFileSync(certPath)
+
+                https.createServer({ key, cert }, app).listen(port, () => {
+                    console.log(`API rodando em https://localhost:${port}`)
+                })
+            } catch (err) {
+                console.error('Erro ao iniciar servidor HTTPS:', err)
+                process.exit(1)
+            }
+        } else {
+            app.listen(port, () => {
+                console.log(`API rodando em http://localhost:${port}`)
+            })
+        }
     })
     .catch((err) => {
         console.error('Erro ao inicializar banco de dados:', err)

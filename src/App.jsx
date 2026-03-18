@@ -87,8 +87,12 @@ function AuthForm({ mode, setMode, onLogin, onSignup }) {
     )
 }
 
+const apiBaseUrl =
+    import.meta.env.VITE_API_URL ||
+    `${window.location.protocol}//localhost:4000/`
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000',
+    baseURL: apiBaseUrl,
 })
 
 // Sempre manda o token salvo no localStorage (se existir)
